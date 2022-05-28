@@ -601,3 +601,15 @@ BEGIN
     set default_purchase_price = @purchase_price
     where id = @product_variation_id
 END
+
+
+-- get best selling product variations
+CREATE PROCEDURE [dbo].[GetBestSellingProductVariations]
+AS
+BEGIN
+    Select TOP 50 pv.id, pv.product_id, pv.name, pv.default_purchase_price, pv.default_retail_price, pv.quantity, pv.alert_quantity, pv.image, pv.description, pv.barcode, pv.sub_category_id, pv.brand_id, pv.tax_id, pv.default_sell_price, pv.sell_price_updated_at, pv.default_purchase_price, pv.purchase_price_updated_at, pv.stock_updated_at, pv.stock, pv.product_updated_at, pv.created_at, pv.updated_at, pv.deleted_at, pv.deleted_by, pv.created_by, pv.updated_by, pv.product_id, pv.sub_category_id, pv.brand_id, pv.tax_id, pv.sell_price_updated_at, pv.purchase_price_updated_at, pv.stock_updated_at, pv.product_updated_at, pv.created_at, pv.updated_at, pv.deleted_at, pv.deleted_by, pv.created_by, pv.updated_by, pv.product_id, pv.sub_category_id, pv.brand_id, pv.tax_id, pv.sell_price_updated_at, pv.purchase_price_updated_at, pv.stock_updated_at, pv.product_updated_at, pv.created_at, pv.updated_at, pv.deleted_at, pv.deleted_by, pv.created_by, pv.updated_by, pv.product_id, pv.sub_category_id, pv.brand_id, pv.tax_id, pv.sell_price_updated_at, pv.purchase_price_updated_at, pv.stock_updated_at, pv
+    from [dbo].[ProductVariation] pv
+    inner join [dbo].[SellLines] sl on sl.product_variation_id = pv.id
+    group by pv.id, pv.product_id, pv.name, pv.default_purchase_price, pv.default_retail_price, pv.quantity, pv.alert_quantity, pv.image, pv.description, pv.barcode, pv.sub_category_id, pv.brand_id, pv.tax_id, pv.default_sell_price, pv.sell_price_updated_at, pv.default_purchase_price, pv.purchase_price_updated_at, pv.stock_updated_at, pv.stock, pv.product_updated_at, pv.created_at, pv.updated_at, pv.deleted_at, pv.deleted_by, pv.created_by, pv.updated_by, pv.product_id, pv.sub_category_id, pv.brand_id, pv.tax_id, pv.sell_price_updated_at, pv.purchase_price_updated_at, pv.stock_updated_at, pv.product_updated_at, pv.created_at, pv.updated_at, pv.deleted_at, pv.deleted_by, pv.created_by, pv.updated_by, pv.product_id, pv.sub_category_id, pv.brand_id, pv.tax_id, pv.sell_price_updated_at, pv.purchase_price_updated_at, pv.stock_updated_at, pv.product_updated_at, pv.created_at, pv.updated_at, pv.deleted_at, pv.deleted_by, pv.created_by, pv.updated_by, pv.product_id, pv.sub_category_id, pv.brand_id, pv.tax_id, pv.sell_price_updated_at, pv.purchase_price_updated_at, pv.stock_updated_at, pv.product
+    order by SUM(sl.quantity) desc
+END

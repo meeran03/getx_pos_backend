@@ -8,6 +8,7 @@ const validator = require("../validation/Auth");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const keys = require("../config/keys");
+const config = require("../config/keys");
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -40,7 +41,7 @@ module.exports = (db) => {
     // @access  Public
     router.get("/best-selling", async (req, res) => {
         let products = await db.query(
-            `Select * from [BestSellingProducts]`
+            `EXEC [GetBestSellingProductVariations]`
         )
         res.json(products.recordset);
     });
@@ -257,6 +258,10 @@ module.exports = (db) => {
         let result = await db.query(
             `EXEC SEARCHVARIATIONS '${query}'`
         )
+        // append the image path to the result
+        for (let i = 0; i < result.recordset.length; i++) {
+            result.recordset[i].image = `${config.image_url}/${result.recordset[i].image}`;
+        }
         res.json(result.recordset);
     });
 

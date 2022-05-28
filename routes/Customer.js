@@ -36,15 +36,15 @@ let upload = multer({
 module.exports = (db) => {
 
     // search customers
-    router.get('search', async (req, res) => {
-        const { query } = req.query;
-        // stored procedure get customers
+    router.get('/search', async (req, res) => {
+        const { query } = req.query; //
+        console.log('I am hit', query)
+        // stored procedure get customers 
         let result = await db.query(`
-            exec GetCustomers '${query}'
+            exec GETCUSTOMERS '${query}'
         `)
         res.json(result.recordset);
     });
-
     // get customers
     router.get('/', async (req, res) => {
         console.log("get customers");
