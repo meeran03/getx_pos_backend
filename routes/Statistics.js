@@ -11,7 +11,7 @@ const keys = require("../config/keys");
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, "images");
+        cb(null, "images")
     },
     filename: function (req, file, cb) {
         cb(null, uuidv4() + "-" + Date.now() + path.extname(file.originalname));

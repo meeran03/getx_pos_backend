@@ -43,12 +43,14 @@ const discounts = require("./routes/Discount")(mssql);
 const purchases = require("./routes/Purchase")(mssql);
 const sales = require("./routes/Sale")(mssql);
 const statistics = require("./routes/Statistics")(mssql);
+const users = require("./routes/User")(mssql);
 
 // here we define our url routes
 app.use("/api/auth", authRoutes);
 app.use("/api/category", categories);
 app.use("/api/product", products);
 app.use("/api/unit", units);
+app.use("/api/user", users);
 app.use("/api/customer", customers);
 app.use("/api/supplier", suppliers)
 app.use("/api/role", roles);
