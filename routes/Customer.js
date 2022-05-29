@@ -100,5 +100,79 @@ module.exports = (db) => {
         let result = await db.query(`UPDATE Contact SET Name = \'${data.name}\', Email = \'${data.email}\', Phone = \'${data.phone}\', Address = \'${data.address}\' WHERE ID = ${id}`);
         res.json({ message: "Customer updated" }, 200);
     });
+
+
+    // add a sale
+    router.post('/sale', async (req, res) => {
+
+        let data = {
+            type: 'sell',
+            contact_id: req.body.contact_id,
+            invoice_no: req.body.invoice_no,
+            transaction_date: new Date().toISOString(),
+            final_total: req.body.final_total,
+            discount_id: req.body.discount_id,
+            discount_amount: req.body.discount_amount,
+        }
+        console.log(req.body);
+        // return;
+
+        // start a db transaction
+        let transaction = new db.Transaction();
+        await transaction.begin()
+        // get id for new transaction
+        try {
+            let result_max = await db.query(`SELECT MAX(ID) AS max FROM [Transaction]`);
+            let id = result_max.recordset[0].max + 1;
+            // generate a new invoice number
+            let invoice_no = await db.query(`SELECT MAX(id) AS max FROM [Transaction] where type = 'sell'`);
+            let invoice_no_id = invoice_no.recordset[0].max + 1;
+            let invoice_no_new = "INV-SELL-" + invoice_no_id;
+            data.invoice_no = invoice_no_new;
+            // create the transaction
+            let result = await db.query(`INSERT INTO [dbo].[Transaction] (
+                ID, Type, Contact_ID, Invoice_No, Transaction_Date, 
+                Final_Total,updated_at,discount_id,discount_amount) VALUES (
+                    ${id}, '${data.type}', ${data.contact_id}, '${data.invoice_no}', '${data.transaction_date}', 
+                    ${data.final_total},
+                    GETDATE(),
+                    ${data.discount_id === 0 ? 'NULL' : data.discount_id},
+                    ${data.discount_id === 0 ? 'NULL' : data.discount_amount}
+                    )`
+            );
+            // create sell lines
+            result_max = await db.query(`SELECT MAX(ID) AS max FROM SellLines`);
+            let sell_line_id = result_max.recordset[0].max + 1;
+
+            for (let i = 0; i < req.body.variations.length; i++) {
+                let result = await db.query(`INSERT INTO SellLines (ID,
+                Transaction_ID, Variation_ID,Product_ID ,Quantity, Sell_Price) VALUES (
+                   ${sell_line_id} ,${id}, ${req.body.variations[i].id},
+                    ${req.body.variations[i].product_id},
+                   ${req.body.variations[i].quantity},
+                    ${req.body.variations[i].sell_price})`
+                );
+                sell_line_id++;
+            }
+
+            // update the quantity
+            for (let i = 0; i < req.body.variations.length; i++) {
+                let result = await db.query(`UPDATE ProductVariation SET Quantity = Quantity - ${req.body.variations[i].quantity} WHERE ID = ${req.body.variations[i].id}`);
+            }
+            // commit the transaction
+            await transaction.commit();
+        } catch (err) {
+            await transaction.rollback();
+            console.log(err);
+            res.status(400).json({
+                message: err.message
+            });
+        }
+        res.json({
+            message: 'success'
+        });
+
+    })
+
     return router;
 }

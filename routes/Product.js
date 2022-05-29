@@ -43,7 +43,12 @@ module.exports = (db) => {
         let products = await db.query(
             `EXEC [GetBestSellingProductVariations]`
         )
-        res.json(products.recordset);
+        // append the product image
+        products = products.recordset;
+        for (let i = 0; i < products.length; i++) {
+            products[i].image = `${config.image_url + products[i].image}`;
+        }
+        res.json(products);
     });
 
     // @route   /api/product/out-of-stock

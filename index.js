@@ -41,6 +41,7 @@ const roles = require("./routes/Role")(mssql);
 const permissions = require("./routes/Permission")(mssql);
 const discounts = require("./routes/Discount")(mssql);
 const purchases = require("./routes/Purchase")(mssql);
+const sales = require("./routes/Sale")(mssql);
 
 // here we define our url routes
 app.use("/api/auth", authRoutes);
@@ -53,3 +54,4 @@ app.use("/api/role", roles);
 app.use("/api/permission", permissions);
 app.use("/api/discount", discounts);
 app.use("/api/purchases", purchases);
+app.use("/api/sales", sales);

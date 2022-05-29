@@ -40,7 +40,7 @@ module.exports = (db) => {
     // @access  Public
     router.get("/", async (req, res) => {
         let sales = await db.query(
-            `exec GetTransactionsWithDate '${req.query.startDate}', '${req.query.endDate}'`
+            `exec GetSellTransactionsWithDate '${req.query.startDate}', '${req.query.endDate}'`
         )
         console.log(sales)
         res.json(sales.recordset);
@@ -55,7 +55,7 @@ module.exports = (db) => {
         )
         // get associated sale orders
         let saleOrders = await db.query(
-            `Select p.*,pv.name as name,pv.default_sell_price as default_sell_price from SellLines p inner join ProductVariation pv on pv.id=p.transaction_id
+            `Select p.*,pv.name as name,pv.default_sell_price as default_sell_price from SellLines p inner join ProductVariation pv on pv.id=p.variation_id
              where p.transaction_id = ${req.params.id}`
         )
         let result = sale.recordset[0];

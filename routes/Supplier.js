@@ -132,6 +132,12 @@ module.exports = (db) => {
                 );
                 purchase_line_id++;
             }
+            // update the quantity
+            for (let i = 0; i < req.body.variations.length; i++) {
+                let result = await db.query(`UPDATE ProductVariation SET Quantity = QUANTITY + ${req.body.variations[i].quantity}
+                WHERE ID = ${req.body.variations[i].id}`
+                );
+            }
             // commit the transaction
             await transaction.commit();
         } catch (err) {
