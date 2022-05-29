@@ -399,16 +399,15 @@ BEGIN
 END
 
 --22
--- get best performing variation of a product
-CREATE PROCEDURE [dbo].[GetBestPerformingVariation]
-    @product_id int
+-- get best performing products
+CREATE VIEW [dbo].[GetBestPerformingProducts]
 AS
-BEGIN
-    Select pv.id, pv.name, pv.product_id, pv.variation_id, pv.sub_sku, pv.price_inc_tax, pv.profit, pv.quantity, pv.alert_quantity
-    from [dbo].[ProductVariation] pv
-    where pv.product_id = @product_id
-    order by pv.profit desc
-END
+    Select TOP 5 p.name, SUM(sl.quantity) as total_quantity
+    from [dbo].[Product] p
+    inner join ProductVariation pv on pv.product_id = p.id
+    inner join [dbo].[SellLines] sl on sl.variation_id = pv.id
+    group by p.name
+    order by total_quantity desc
 
 --23
 -- get all the products of a category
@@ -528,7 +527,7 @@ BEGIN
 END
 
 -- get current month sales
-CREATE PROCEDURE [dbo].[GetCurrentMonthSales]
+CREATE VIEW [dbo].[GetCurrentMonthSales]
 AS
 BEGIN
     Select SUM(t.total_amount) as total_sales from [dbo].[Transaction] t

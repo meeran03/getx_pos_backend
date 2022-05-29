@@ -80,12 +80,6 @@ module.exports = (db) => {
         res.json(result.recordset);
     });
 
-    // get top buyer customers
-    router.get('/top-customers', async (req, res) => {
-        let result = await db.query(`Select * from GetTopBuyerCustomers`)
-        res.json(result);
-    })
-
 
     // update customer
     router.put('/:id', async (req, res) => {
@@ -173,6 +167,7 @@ module.exports = (db) => {
         });
 
     })
+
 
     return router;
 }
