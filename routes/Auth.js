@@ -51,7 +51,7 @@ module.exports = (db) => {
         const password = req.body.password;
         // get user info from db
         let user = await db.query(
-            `SELECT * FROM [User] WHERE email='${email}'`,
+            `SELECT u.*,r.name as role FROM [User] u inner join Role r on r.id =u.role_id  WHERE u.email='${email}'`,
         )
         // // Find user by email
         if (user.recordset.length === 0) {
@@ -60,7 +60,7 @@ module.exports = (db) => {
         user = (user.recordset[0]);
 
         // Check password
-        bcrypt.compare(password, user.password).then((isMatch) => {
+        bcrypt.compare(password, user.password).then(async (isMatch) => {
             if (isMatch) {
                 // user matched
                 // Create JWT Payload
@@ -70,6 +70,12 @@ module.exports = (db) => {
                 };
                 // delete password from user
                 delete user.password;
+                // get associated permissions
+                let permissions = await db.query(
+                    `Select p.* from Permission p inner join RolePermission rp on rp.permission_id = p.id where rp.role_id = ${user.role_id}`,
+                )
+                console.log(permissions)
+                user.permissions = permissions.recordset;
                 // Sign token
                 jwt.sign(
                     payload,
