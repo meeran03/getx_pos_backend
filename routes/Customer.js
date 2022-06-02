@@ -168,6 +168,21 @@ module.exports = (db) => {
 
     })
 
+    // get all purchases of a customer
+    router.get('/purchases/:id', async (req, res) => {
+        const { id } = req.params;
+        let result = await db.query(`SELECT * FROM [Transaction] t WHERE t.Contact_ID = ${id} AND t.Type = 'sell'`);
+        // get the total amount of purchases
+        let total_purchases = await db.query(
+            `Select COUNT (*) as purchases, SUM(final_total) as totalPurchases from [Transaction] t1
+            WHERE t1.Contact_ID =${id} AND t1.Type = 'sell'`);
+        console.log(total_purchases);
+        res.json({
+            result: result.recordset,
+            purchases: total_purchases.recordset[0].purchases,
+            purchasesAmount: total_purchases.recordset[0].totalPurchases
+        });
+    });
 
     return router;
 }

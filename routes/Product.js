@@ -180,12 +180,30 @@ module.exports = (db) => {
         }
     })
 
-    // delete product variation
+    // delete product
     router.delete("/:id", async (req, res) => {
-        let result = await db.query(
-            `DELETE FROM [ProductVariation] where id = ${req.params.id}`
-        )
-        res.json(result.recordset);
+        try {
+            let result = await db.query(
+                `DELETE FROM [Product] where id = ${req.params.id}`
+            )
+            res.json(result.recordset);
+        } catch (err) {
+            console.log(err)
+            res.status(400).json(err.originalError);
+        }
+    });
+
+    // delete product variation
+    router.delete("/variation/:id", async (req, res) => {
+        try {
+            let result = await db.query(
+                `DELETE FROM [ProductVariation] where id = ${req.params.id}`
+            )
+            res.json(result.recordset);
+        } catch (err) {
+            console.log(err)
+            res.status(400).json(err);
+        }
     });
 
     // update product variation
